@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Rinderschädel 3D</title>
+<style>
+:root{--bg:#14110f;--panel:#1c1814;--line:#2e2822;--bone:#efe6d2;--mute:#a99f8d;--amber:#d9a441}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--bone);
+  font:17px/1.5 -apple-system,BlinkMacSystemFont,"Helvetica Neue",system-ui,sans-serif;overscroll-behavior:none;overflow:hidden}
+#v{position:fixed;inset:0;width:100%;height:100%;border:0}
+#markers{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.m{position:absolute;left:0;top:0;display:flex;align-items:center;gap:8px;padding:0;border:0;background:none;
+  color:inherit;font:inherit;pointer-events:auto;cursor:pointer;transform:translate(-9999px,-9999px);will-change:transform}
+.m .n{position:relative;flex:none;width:34px;height:34px;margin-left:-17px;border-radius:50%;
+  background:rgba(20,17,15,.85);border:2px solid var(--amber);color:var(--amber);display:grid;place-items:center;font-weight:700;font-size:15px}
+.m .n::after{content:"";position:absolute;inset:-9px;border-radius:50%}
+.m .l{white-space:nowrap;background:rgba(20,17,15,.85);border:1px solid var(--line);border-radius:999px;padding:3px 11px;font-size:14px;pointer-events:none}
+.m.sel .n{background:var(--amber);color:#1a1409}
+.m.sel .n::before{content:"";position:absolute;inset:-7px;border-radius:50%;border:2px solid var(--amber);animation:p 1.6s ease-out infinite}
+@keyframes p{0%{transform:scale(.8);opacity:.9}100%{transform:scale(1.6);opacity:0}}
+.m.back .l{display:none}
+#top{position:fixed;left:0;right:0;top:0;padding:calc(10px + env(safe-area-inset-top)) 14px 24px;pointer-events:none;
+  background:linear-gradient(#14110fcc,#14110f00)}
+#top h1{margin:0;font:600 22px/1.2 ui-serif,Georgia,serif}
+#top small{display:block;color:var(--mute);font:14px/1.3 -apple-system,system-ui,sans-serif}
+button.b{appearance:none;border:1px solid var(--amber);background:#14110fe0;color:var(--amber);border-radius:999px;
+  padding:10px 18px;min-height:44px;font:600 16px -apple-system,system-ui,sans-serif;cursor:pointer}
+#open{position:fixed;right:calc(12px + env(safe-area-inset-right));top:50%;transform:translateY(-50%)}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-height:70vh;overflow-y:auto;background:var(--panel);border-top:1px solid var(--line);
+  border-radius:18px 18px 0 0;padding:18px 18px calc(22px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .3s;z-index:5}
+.sheet.open{transform:none}
+@media (min-width:900px){.sheet{left:auto;width:400px;top:0;max-height:none;border-radius:0;border-left:1px solid var(--line);border-top:0;transform:translateX(105%)}.sheet.open{transform:none}}
+.sheet h2{font:600 22px/1.2 ui-serif,Georgia,serif;margin:0}
+.lat{color:var(--amber);font-style:italic;margin:2px 0 10px;font-size:15px}
+.sheet h3{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);margin:18px 0 6px}
+.sheet p{margin:0 0 10px}
+.sheet ul{margin:0;padding-left:20px}.sheet li{margin:0 0 7px}
+.fact{background:#2b2318;border-left:3px solid var(--amber);border-radius:8px;padding:10px 13px;margin:6px 0 14px}
+.fact small{display:block;color:var(--amber);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:11px;margin-bottom:2px}
+.nav{display:flex;gap:8px;flex-wrap:wrap}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;margin:8px 0}
+.kv span:nth-child(odd){color:var(--mute)}
+.credit{color:var(--mute);font-size:14px;margin-top:18px}.credit a{color:var(--mute)}
+#toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(28,24,20,.95);border:1px solid var(--line);
+  border-radius:12px;padding:14px 20px;color:var(--mute);pointer-events:none;transition:opacity .4s}
+</style>
+</head>
+<body>
+<iframe id="v" title="3D-Modell Rinderschädel" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
+<div id="markers"></div>
+<div id="top"><h1>Rinderschädel<small>Drehen: ein Finger · Zoomen: zwei Finger</small></h1></div>
+<button class="b" id="open" type="button">Info</button>
+<div id="toast">Modell wird geladen …</div>
+
+<div class="sheet" id="detail" role="dialog" aria-label="Hotspot"></div>
+
+<div class="sheet" id="info" role="dialog" aria-label="Informationen">
+  <div class="nav" style="justify-content:space-between;margin-bottom:6px"><h2>Hausrind (<i>Bos taurus</i>)</h2><button class="b" data-close="info" type="button">Schließen</button></div>
+  <div class="kv">
+    <span>Sammlung</span><span>Naturkundemuseum der Stadt Kishiwada, Osaka, Japan</span>
+    <span>Objektnummer</span><span>KSNHM_Mm-184</span>
+    <span>Art</span><span>Hausrind</span>
+  </div>
+  <h3>Worauf du achten kannst</h3>
+  <ul>
+    <li>Im Oberkiefer fehlen die Schneidezähne. Rinder haben dort eine Zahnplatte und reißen das Gras ab.</li>
+    <li>Hinten im Kiefer liegen breite Backenzähne mit Leisten zum Zermahlen von Gras.</li>
+    <li>Die Augenhöhlen sitzen seitlich. So überblicken Rinder fast die ganze Umgebung.</li>
+    <li>Die Hornzapfen sind nur der Knochenkern. Das Horn selbst besteht aus Keratin und fehlt hier.</li>
+  </ul>
+  <h3>Fragen zum Entdecken</h3>
+  <ul>
+    <li>Woran erkennst du, dass das Rind ein Pflanzenfresser ist?</li>
+    <li>Wie viele Zähne zählst du im Unterkiefer?</li>
+    <li>Wie unterscheidet sich der Schädel von dem eines Hundes?</li>
+  </ul>
+  <div class="credit">
+    3D-Modell „KSNHM_Mm-184 Cow Skull“ von Kent MORI (@rojohaku) auf
+    <a href="https://sketchfab.com/3d-models/ksnhm-mm-184-cow-skull-34dec78a771543ff8a79701090a93070" target="_blank" rel="noopener">Sketchfab</a>.
+    Die Beschriftungen des Museums wurden ins Deutsche übertragen und ergänzt.
+    Anfragen zum Modell: <a href="https://rojohaku.com/contact/" target="_blank" rel="noopener">rojohaku.com/contact</a>
+  </div>
+</div>
+
+<script>
+/* @sketchfab/viewer-api 1.12.1, ISC-Lizenz, (c) Sketchfab. Direkt eingebettet. */
+!function(t,e){"object"==typeof exports&&"object"==typeof module?module.exports=e():"function"==typeof define&&define.amd?define([],e):"object"==typeof exports?exports.Sketchfab=e():t.Sketchfab=e()}(self,(()=>(()=>{"use strict";var t={d:(e,i)=>{for(var n in i)t.o(i,n)&&!t.o(e,n)&&Object.defineProperty(e,n,{enumerable:!0,get:i[n]})},o:(t,e)=>Object.prototype.hasOwnProperty.call(t,e)},e={};function i(t){return i="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t},i(t)}t.d(e,{default:()=>h});var n=function(t,e){t.forEach((function(t){this[t]=function(){var i,n=e._requestIdCounter++,s=Array.prototype.slice.call(arguments);if(s.length>0){var r=s[s.length-1];"function"==typeof r&&(i=s.pop())}i&&(e._pendingRequests[n]=i.bind(this)),e._target.postMessage({type:"api.request",instanceId:e.getIdentifier(),requestId:n,member:t,arguments:s},e.getDomain())}}),this),this.addEventListener=function(t,i,n){"viewerready"===t&&e.isViewerReady&&i(),e._eventListeners[t]||(e._eventListeners[t]=[]),e._eventListeners[t].push(i),n&&this.setListenerOptions&&(n.name=t,this.setListenerOptions(n))},this.removeEventListener=function(t,i){if(e._eventListeners[t]){var n=e._eventListeners[t].indexOf(i);-1!==n&&e._eventListeners[t].splice(n,1)}}},s=function(t,e,i){this._target=t,this._requestIdCounter=0,this._pendingRequests={},this._eventListeners={},this._ready=!1,this._domain=i,this._instanceId=e,this.listenServer()};s.prototype={getIdentifier:function(){return this._instanceId},getDomain:function(){return this._domain},setIdentifier:function(t){this._instanceId=t},use:function(t,e){this._version=t,this._ready=!0;var i=this._requestIdCounter++;this._pendingRequests[i]=function(t,i,s){t?e.call(this,t):e.call(this,null,new n(s,this))}.bind(this),this._target.postMessage({type:"api.initialize",requestId:i,name:t,instanceId:this._instanceId},this._domain)},listenServer:function(){if(!this._serverReceiveMessageBinded){var t=["api.initialize.result","api.request.result","api.event"];this._serverReceiveMessageBinded=function(e){if(e.origin===this._domain&&e.data&&e.data.type&&e.data.instanceId&&e.data.instanceId===this.getIdentifier()){var i=e.data.type;if(-1!==t.indexOf(i))if("api.event"===i){var n=e.data.results,s=n[0];if(this._eventListeners["*"]||this._eventListeners.all)return void["*","all"].forEach((function(t){var e=this._eventListeners[t];e&&e.forEach((function(t){t.apply(t,n)}))}),this);var r=n.slice(1),o=this._eventListeners[s];o?o.forEach((function(t){t.apply(t,r)})):"viewerready"===s&&(this.isViewerReady=!0)}else{var a=e.data.requestId,d=this._pendingRequests[a];if(!d)return;d.apply(null,e.data.results),this._pendingRequests[a]=void 0}}}.bind(this),window.addEventListener("message",this._serverReceiveMessageBinded)}}};const r=s;var o=/[&|;]+/g;function a(t){return"object"===i(t)?(e=t,n={},Object.keys(e).forEach((function(t){n[t]=Array.isArray(e[t])?e[t]:[e[t]]})),n):("?"===t[0]&&(t=t.substr(1)),t.split(o).reduce((function(t,e){if(0===e.length)return t;var i=e.indexOf("=");-1===i&&(i=e.length);var n=decodeURIComponent(e.substr(0,i).replace(/\+/g,"%20")),s=decodeURIComponent(e.substr(i+1).replace(/\+/g,"%20"));return void 0===t[n]&&(t[n]=[]),t[n].push(s),t}),{}));var e,n}window.SketchfabAPIClient=r;var d=function(t,e){var n=t,s=e;"object"===i(t)&&(s=t,n=null),this._version=n,this._target=s,window.sketchfabAPIinstances||(window.sketchfabAPIinstances=[]),window.sketchfabAPIinstances.push(this),this._apiId=window.sketchfabAPIinstances.length.toString(),this._target.id&&(this._apiId+="_"+this._target.id),this._target.allow||(this._target.allow="vr; autoplay; fullscreen"),this._client=void 0,this._options=void 0,this._domain="sketchfab.com",this._domain="same-as-current"===this._domain?window.location.hostname:this._domain,this._urlTemplate="https://YYYY/models/XXXX/embed",this._url=this._urlTemplate.replace("YYYY",this._domain),this._transmitOptions={},this._getURLOptions()};d.prototype={_urlOptionsDict:{skfb_api_version:{default:"1.12.1",type:"string"}},_optionsLoaded:function(t){this._urlOptions=t,this._version=this._getURLOption("skfb_api_version",this._version)},_getURLOption:function(t,e){var i=this._urlOptionsDict[t];if(!i)return e;null==e&&(e=i.default);var n=this._urlOptions[t];return n&&n.length?n[0]:e},_getURLOptions:function(){if(!window||!window.location.search)return this._optionsLoaded({});var t=a(window.location.search);for(var e in t)e.startsWith("skfb_")&&(this._transmitOptions[e.substr(5)]=t[e]);return this._optionsLoaded(t)},getEmbedURL:function(t,e){var i=this._url+"?api_version="+this._version+"&api_id="+this._apiId;e&&Object.keys(e).forEach((function(t){null!=e[t]&&"function"!=typeof e[t]&&(i+="&"+t.toString()+"="+e[t].toString())}));var n=this._transmitOptions;return Object.keys(this._transmitOptions).forEach((function(t){i+="&"+t.toString()+"="+n[t].toString()})),i.replace("XXXX",t)},init:function(t,e){this._options=e,this._uid=t,this._realInit()},_initializeAPIEmbed:function(t){if(t.data&&t.data.instanceId&&this._apiId===t.data.instanceId&&"api.ready"===t.data.type&&this._target.src){if(void 0!==t.data.error)return this.error(t.data.error),void window.removeEventListener("message",this._initializeAPIEmbedBinded);var e=this._target.src.split("/");e="https://"+e[2],this._client&&(console.log("reusing a Sketchfab instance for multiple client is not supported, please create a new sketchfab instance"),window.removeEventListener("message",this._client._serverReceiveMessageBinded)),this._client=new window.SketchfabAPIClient(this._target.contentWindow,this._apiId,e),this._client.use(this._version,function(t,e){if(t)throw t;this.success.call(this,e)}.bind(this)),window.removeEventListener("message",this._initializeAPIEmbedBinded)}},_realInit:function(){this._initializeAPIEmbedBinded||(this._initializeAPIEmbedBinded=this._initializeAPIEmbed.bind(this)),window.addEventListener("message",this._initializeAPIEmbedBinded),this._target.src=this.getEmbedURL(this._uid,this._options)},success:function(t){this._options.success&&"function"==typeof this._options.success&&this._options.success(t)},error:function(t){this._options.error&&"function"==typeof this._options.error&&this._options.error(t)},show:function(){var t=this._target.style.top;this._target.style.top="-1000vh",Promise.resolve().then(function(){this._target.style.top=t}.bind(this))}};const h=d;return e.default})()));
+</script>
+<script>
+(function(){
+'use strict';
+var UID='34dec78a771543ff8a79701090a93070';
+
+/* Positionen und Kameraansichten stammen aus den Annotationen des Modells, Texte sind übersetzt (jp: Original). */
+var HS=[
+ {de:'Linke Augenhöhle',lat:'Orbita',jp:'左眼窩',
+  p:[51.70857311212781,-85.83126632096977,168.59997015505112],e:[-289.83519942647274,-530.0468702010037,365.1075876689042],t:[10.033679966275399,-5.964283073935181,50.514165878386834],
+  text:'Der Knochenring schützt das Auge. Beim Rind ist er rundum geschlossen.',
+  fact:'Die Augen sitzen seitlich am Kopf. So überblickt ein Rind rund 330 Grad, fast die ganze Umgebung.'},
+ {de:'Linke Ohröffnung',lat:'Porus acusticus externus',jp:'左耳孔',
+  p:[176.96626465874962,-81.43925510082462,137.02974558569443],e:[84.66025622403495,-313.0042714218348,141.14262277403375],t:[162.47342169282516,-5.664034934515595,102.86086708520965],
+  text:'Hier beginnt der knöcherne Gehörgang. Er führt zum Mittel- und Innenohr.',
+  fact:'Rinder können ihre Ohren unabhängig voneinander bewegen und so Geräusche orten.'},
+ {de:'Hinterhauptsloch',lat:'Foramen magnum',jp:'大後頭孔',
+  p:[196.09205706956718,12.329651444664417,118.80925221550204],e:[633.2577079236671,22.813432437765854,127.39087991745639],t:[162.47342169282516,-5.664034934515595,102.86086708520965],
+  text:'Durch diese große Öffnung verläuft das Rückenmark.',
+  fact:'Daneben sitzen die Gelenkhöcker. Auf ihnen trägt der erste Halswirbel, der Atlas, den Kopf.'},
+ {de:'Keine oberen Schneidezähne',lat:'Oberkiefer',jp:'上顎前歯は無い',
+  p:[-237.94873240299995,6.853224562029812,127.96859092059287],e:[-514.8826522358487,-73.38265727846388,70.35354073635656],t:[147.6703650756633,79.89896316911268,94.75727804493052],
+  text:'Wiederkäuer haben im Oberkiefer keine Schneidezähne.',
+  fact:'Stattdessen liegt dort eine harte Zahnplatte. Das Gras wird zwischen ihr und den unteren Schneidezähnen eingeklemmt und abgerissen.'},
+ {de:'Oberkieferloch',lat:'Nervus maxillaris',jp:'上顎孔',
+  p:[-95.53696082204527,-23.464512943983962,132.35994412423605],e:[-249.2254802094256,-222.23810035761238,187.30334107812715],t:[89.23134385534375,136.58958604465806,101.30482753445261],
+  text:'Hier verläuft der Oberkiefernerv, einer der Äste des Drillingsnervs (Trigeminus).',
+  fact:'Der Trigeminus ist der wichtigste Gesichtsnerv. Er meldet Berührung und steuert die Kaumuskeln.'},
+ {de:'Unterkieferloch',lat:'Nervus mandibularis',jp:'下顎孔',
+  p:[-174.60500011195217,-5.853260815445265,69.3588643564351],e:[-280.1260737275792,-143.91299231681424,141.29883830949115],t:[-7.06679387783379,123.72923675918648,1.3969366454307641],
+  text:'Hier verläuft der Unterkiefernerv, ein weiterer Ast des Drillingsnervs.',
+  fact:'Er versorgt den Unterkiefer, die unteren Zähne und die Kaumuskeln.'},
+ {de:'Überaugenloch',lat:'Foramen supraorbitale',jp:'眼窩上孔',
+  p:[105.51810938678823,-47.50696734929213,247.93210804796135],e:[12.57928714748752,-170.58477920385565,405.82630968946137],t:[226.25452289574238,22.384022613331982,114.28412375473864],
+  text:'Hier verläuft der Augennerv, ebenfalls ein Ast des Drillingsnervs.',
+  fact:'Die drei Äste heißen Augennerv, Oberkiefernerv und Unterkiefernerv. Daher der Name Drillingsnerv.'},
+ {de:'Kiefergelenk: Unterkieferköpfchen',lat:'Caput mandibulae',jp:'顎関節（下顎頭）',
+  p:[158.40746936320102,-41.71188267606694,141.1485402681584],e:[66.97035629697936,-180.80660664470102,166.60645708594245],t:[189.46331036508732,29.191348651200943,117.47236280109897],
+  text:'Das gewölbte Ende des Unterkiefers. Es gleitet im Gelenk am Schädel.',
+  fact:'Rinder mahlen seitlich: Beim Wiederkäuen schwingt der Unterkiefer hin und her.'},
+ {de:'Kiefergelenk: Gelenkgrube',lat:'Fossa mandibularis',jp:'顎関節（下顎窩）',
+  p:[165.1687710456964,-38.33599358577928,146.26166359215105],e:[3.8113701436022325,-134.8306693496541,129.63620055521588],t:[189.46331036508732,29.191348651200943,117.47236280109897],
+  text:'Die Gelenkpfanne am Schädel, in der das Unterkieferköpfchen sitzt.',
+  fact:'Eine Kuh kaut viele Stunden am Tag wieder. Das Kiefergelenk leistet dabei Schwerstarbeit.'},
+ {de:'Objektnummer',lat:'KSNHM_Mm-184',jp:'標本番号',
+  p:[-183.063507186477,-114.94836378682744,-16.164287698242035],e:[-232.85051556755113,-189.73416496223143,196.11915476714424],t:[-213.99684739845108,-116.29369336213037,44.037231029004204],
+  text:'Das Etikett am Sockel zeigt die Sammlungsnummer des Museums.',
+  fact:'So lässt sich jedes Stück einer Sammlung eindeutig wiederfinden, auch nach Jahrzehnten.'}
+];
+
+var $=function(s){return document.querySelector(s);};
+var api=null,ready=false,home=null,sel=-1,busy=false,last=0;
+var layer=$('#markers'),detail=$('#detail'),info=$('#info'),toast=$('#toast');
+
+function sub(a,b){return [a[0]-b[0],a[1]-b[1],a[2]-b[2]];}
+function norm(a){var l=Math.hypot(a[0],a[1],a[2])||1;return [a[0]/l,a[1]/l,a[2]/l];}
+function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+HS.forEach(function(h,i){h.dir=norm(sub(h.e,h.t));});
+
+HS.forEach(function(h,i){
+  var b=document.createElement('button');b.type='button';b.className='m';b.id='m'+i;b.hidden=true;
+  b.innerHTML='<span class="n">'+(i+1)+'</span><span class="l">'+h.de+'</span>';
+  b.addEventListener('click',function(e){e.stopPropagation();select(i);});
+  layer.appendChild(b);
+});
+
+function select(i){
+  sel=i;var h=HS[i];
+  HS.forEach(function(_,k){$('#m'+k).classList.toggle('sel',k===i);});
+  detail.innerHTML='<div class="nav" style="justify-content:space-between;align-items:flex-start;margin-bottom:4px"><div><h2>'+(i+1)+'. '+h.de+'</h2><div class="lat">'+h.lat+'</div></div>'
+    +'<button class="b" data-close="detail" type="button">Schließen</button></div>'
+    +'<p>'+h.text+'</p><div class="fact"><small>Wusstest du?</small>'+h.fact+'</div>'
+    +'<div class="nav"><button class="b" data-go="-1" type="button">‹ Zurück</button><button class="b" data-go="1" type="button">Weiter ›</button>'
+    +'<button class="b" data-go="home" type="button">Gesamtansicht</button></div>';
+  detail.classList.add('open');info.classList.remove('open');
+  if(api)api.setCameraLookAt(h.e,h.t,1.3);
+}
+document.addEventListener('click',function(ev){
+  var c=ev.target.closest('[data-close]');
+  if(c){$('#'+c.dataset.close).classList.remove('open');if(c.dataset.close==='detail')deselect();return;}
+  var g=ev.target.closest('[data-go]');
+  if(g){var v=g.dataset.go;
+    if(v==='home'){deselect();detail.classList.remove('open');if(api&&home)api.setCameraLookAt(home.position,home.target,1.2);}
+    else select((sel+parseInt(v,10)+HS.length)%HS.length);}
+});
+function deselect(){sel=-1;HS.forEach(function(_,k){$('#m'+k).classList.remove('sel');});}
+$('#open').addEventListener('click',function(){detail.classList.remove('open');info.classList.add('open');});
+
+function loop(t){
+  requestAnimationFrame(loop);
+  if(!api||!ready||busy||t-last<40)return;
+  last=t;busy=true;
+  api.getCameraLookAt(function(err,cam){
+    if(err||!cam){busy=false;return;}
+    var d0=norm(sub(cam.position,cam.target)),pending=HS.length;
+    HS.forEach(function(h,i){
+      api.getWorldToScreenCoordinates(h.p,function(e2,r){
+        if(!e2&&r){
+          var xy=r.windowCoord||r.canvasCoord,el=$('#m'+i);
+          if(xy){
+            var d=dot(d0,h.dir),vis=d>0.35?1:(d>0?0.5:0.18);
+            if(i===sel)vis=1;
+            el.hidden=false;
+            el.style.transform='translate('+xy[0].toFixed(1)+'px,'+xy[1].toFixed(1)+'px) translateY(-50%)';
+            el.style.opacity=vis;
+            el.style.pointerEvents=vis<0.3?'none':'auto';
+            el.classList.toggle('back',vis<1&&i!==sel);
+          }
+        }
+        if(--pending===0)busy=false;
+      });
+    });
+  });
+}
+requestAnimationFrame(loop);
+
+function fail(m){toast.textContent=m;toast.style.opacity=1;}
+if(typeof Sketchfab==='undefined'){fail('Der Viewer konnte nicht gestartet werden.');}
+else{
+  var client=new Sketchfab($('#v'));
+  client.init(UID,{
+    success:function(a){
+      api=a;
+      api.addEventListener('viewerready',function(){
+        ready=true;toast.style.opacity=0;
+        api.getCameraLookAt(function(e,c){if(!e)home=c;});
+      });
+    },
+    error:function(){fail('Das Modell konnte nicht geladen werden.');},
+    autostart:1,preload:1,dnt:1,ui_infos:0,ui_hint:0,ui_help:0,ui_annotations:0,annotations_visible:0
+  });
+}
+})();
+</script>
+</body>
+</html>
