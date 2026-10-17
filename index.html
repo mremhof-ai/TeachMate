@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Rinderschädel 3D</title>
+<style>
+:root{--bg:#14110f;--panel:#1c1814;--line:#2e2822;--bone:#efe6d2;--mute:#a99f8d;--amber:#d9a441}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--bone);
+  font:17px/1.5 -apple-system,BlinkMacSystemFont,"Helvetica Neue",system-ui,sans-serif;overscroll-behavior:none}
+#v{position:fixed;inset:0;width:100%;height:100%;border:0}
+#top{position:fixed;left:0;right:0;top:0;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;pointer-events:none;
+  background:linear-gradient(#14110fcc,#14110f00)}
+#top h1{margin:0;font:600 22px/1.2 ui-serif,Georgia,serif;pointer-events:none}
+#top small{display:block;color:var(--mute);font:14px/1.3 -apple-system,system-ui,sans-serif}
+button{pointer-events:auto;appearance:none;border:1px solid var(--amber);background:#14110fd9;color:var(--amber);
+  border-radius:999px;padding:10px 18px;min-height:44px;font:600 16px -apple-system,system-ui,sans-serif;cursor:pointer}
+#sheet{position:fixed;left:0;right:0;bottom:0;max-height:72vh;overflow-y:auto;background:var(--panel);
+  border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:18px 18px calc(22px + env(safe-area-inset-bottom));
+  transform:translateY(105%);transition:transform .3s}
+#sheet.open{transform:none}
+@media (min-width:900px){#sheet{left:auto;width:420px;top:0;max-height:none;border-radius:0;border-left:1px solid var(--line);border-top:0;
+  transform:translateX(105%)}#sheet.open{transform:none}}
+#sheet h2{font:600 20px/1.2 ui-serif,Georgia,serif;margin:0 0 6px}
+#sheet h3{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);margin:18px 0 6px}
+#sheet ul{margin:0;padding-left:20px}#sheet li{margin:0 0 7px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;margin:8px 0}
+.kv span:nth-child(odd){color:var(--mute)}
+.credit{color:var(--mute);font-size:14px;margin-top:18px}
+.credit a{color:var(--mute)}
+#close{float:right;margin-left:10px}
+</style>
+</head>
+<body>
+<iframe id="v" title="3D-Modell Rinderschädel"
+  src="https://sketchfab.com/models/34dec78a771543ff8a79701090a93070/embed?autostart=1&preload=1&dnt=1&ui_infos=0&ui_hint=2&ui_help=0"
+  allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
+
+<div id="top">
+  <h1>Rinderschädel<small>Drehen: ein Finger · Zoomen: zwei Finger</small></h1>
+  <button id="open" type="button">Info</button>
+</div>
+
+<div id="sheet" role="dialog" aria-label="Informationen">
+  <button id="close" type="button">Schließen</button>
+  <h2>Hausrind (<i>Bos taurus</i>)</h2>
+  <div class="kv">
+    <span>Sammlung</span><span>Naturkundemuseum der Stadt Kishiwada, Osaka, Japan</span>
+    <span>Objektnummer</span><span>KSNHM_Mm-184</span>
+    <span>Art</span><span>Hausrind</span>
+  </div>
+
+  <h3>Worauf du achten kannst</h3>
+  <ul>
+    <li>Oben im Kiefer fehlen die Schneidezähne. Rinder haben dort eine Zahnplatte und reißen das Gras ab.</li>
+    <li>Hinten im Kiefer liegen breite Backenzähne mit Leisten zum Zermahlen von Gras.</li>
+    <li>Die Augenhöhlen sitzen seitlich. So überblicken Rinder fast die ganze Umgebung.</li>
+    <li>Die Hornzapfen sind nur der Knochenkern. Das Horn selbst besteht aus Keratin und fehlt hier.</li>
+    <li>Das große Loch an der Unterseite hinten ist das Hinterhauptsloch. Dort tritt das Rückenmark ein.</li>
+  </ul>
+
+  <h3>Fragen zum Entdecken</h3>
+  <ul>
+    <li>Wo kannst du erkennen, dass das Rind ein Pflanzenfresser ist?</li>
+    <li>Wie viele Zähne zählst du im Unterkiefer?</li>
+    <li>Wie unterscheidet sich der Schädel von dem eines Hundes?</li>
+  </ul>
+
+  <div class="credit">
+    3D-Modell „KSNHM_Mm-184 Cow Skull“ von Kent MORI (@rojohaku) auf
+    <a href="https://sketchfab.com/3d-models/ksnhm-mm-184-cow-skull-34dec78a771543ff8a79701090a93070" target="_blank" rel="noopener">Sketchfab</a>.
+    Anfragen zum Modell: <a href="https://rojohaku.com/contact/" target="_blank" rel="noopener">rojohaku.com/contact</a>
+  </div>
+</div>
+
+<script>
+var s=document.getElementById('sheet');
+document.getElementById('open').onclick=function(){s.classList.add('open')};
+document.getElementById('close').onclick=function(){s.classList.remove('open')};
+</script>
+</body>
+</html>
