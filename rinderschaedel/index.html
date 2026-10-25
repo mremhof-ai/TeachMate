@@ -24,6 +24,7 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--bone);
 .m.back .l{display:none}
 #top{position:fixed;left:0;right:0;top:0;padding:calc(10px + env(safe-area-inset-top)) 14px 24px;pointer-events:none;
   background:linear-gradient(#14110fcc,#14110f00)}
+#top .back{pointer-events:auto;display:inline-block;color:var(--amber);text-decoration:none;font:600 15px -apple-system,system-ui,sans-serif;padding:4px 0 6px}
 #top h1{margin:0;font:600 22px/1.2 ui-serif,Georgia,serif}
 #top small{display:block;color:var(--mute);font:14px/1.3 -apple-system,system-ui,sans-serif}
 button.b{appearance:none;border:1px solid var(--amber);background:#14110fe0;color:var(--amber);border-radius:999px;
@@ -51,7 +52,7 @@ button.b{appearance:none;border:1px solid var(--amber);background:#14110fe0;colo
 <body>
 <iframe id="v" title="3D-Modell Rinderschädel" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
 <div id="markers"></div>
-<div id="top"><h1>Rinderschädel<small>Drehen: ein Finger · Zoomen: zwei Finger</small></h1></div>
+<div id="top"><a class="back" href="../">‹ Übersicht</a><h1>Rinderschädel<small>Drehen: ein Finger · Zoomen: zwei Finger</small></h1></div>
 <button class="b" id="open" type="button">Info</button>
 <div id="toast">Modell wird geladen …</div>
 
